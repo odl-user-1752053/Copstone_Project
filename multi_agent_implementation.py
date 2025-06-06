@@ -66,10 +66,9 @@ async def run_multi_agent(input: str):
     # Aggiungi il servizio di chat completion (devi configurare Azure OpenAI)
     chat_service = AzureChatCompletion(
         service_id="chat-completion",
-        # Aggiungi qui i tuoi parametri di configurazione Azure
-        # deployment_name="your-deployment-name",
-        # endpoint="your-endpoint",
-        # api_key="your-api-key",
+        deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4"),
+        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
     )
     kernel.add_service(chat_service)
     
@@ -79,13 +78,9 @@ async def run_multi_agent(input: str):
     # Crea la strategia di terminazione
     termination_strategy = ApprovalTerminationStrategy()
     
-    # Crea la strategia di selezione (round-robin o basata su funzioni)
-    selection_strategy = KernelFunctionSelectionStrategy()
-    
     # Crea il gruppo di chat degli agenti
     agent_group_chat = AgentGroupChat(
         agents=[business_analyst, software_engineer, product_owner],
-        selection_strategy=selection_strategy,
         termination_strategy=termination_strategy
     )
     
